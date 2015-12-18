@@ -735,7 +735,7 @@ Change widths as necessary
 {
 width: 100%;
 text-align: center;
-background: rgb(173, 83, 41);
+background: rgb(173, 83, 41,0.8);
 box-shadow: 0px 10px 10px #888888;
 color: #fff;
 font-size: 29px;
