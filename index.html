@@ -18,7 +18,7 @@
   <script src="js/vendor/jquery.hashchange.min.js"></script>
   <script src="js/vendor/jquery.easytabs.min.js"></script>
 
-  <script src="js/main.js"></script>
+  <script src="js/main.js"></script> <!--calling a file -->
   <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
       <script>window.html5 || document.write('<script src="js/vendor/html5shiv.js"><\/script>')</script>
@@ -43,22 +43,36 @@
                 </h4>
             </div>
         </header>
+        <script>
+        function about_f1(){
+            document.title='About';
+        }
+         function resume_f1(){
+            document.title='Resume';
+        }
+        function resource_f1(){
+            document.title='Resources';
+        }
+        function contact_f1(){
+            document.title='Contact';
+        }
+        </script>
         <!-- Header End -->
         <!-- Main Tab Container -->
         <div id="tab-container" class="tab-container">
           <!-- Tab List -->
             <ul class='etabs'>
                 <li class='tab' id="tab-about">
-                  <a href="#about"><i class="icon-user"></i><span> About Me</span></a>
+                  <a href="#about" onclick="about_f1()"><i class="icon-user"></i><span> About Me</span></a>
                 </li>
                 <li class='tab'>
-                   <a href="#resume"><i class="icon-file-text"></i><span> Resume</span></a>
+                   <a href="#resume" onclick="resume_f1()"><i class="icon-file-text"></i><span> Resume</span></a>
                 </li>
-                <!-- <li class='tab'>
-                  <a href="#portfolio"><i class="icon-heart"></i><span> Portfolio</span></a>
-                </li> -->
                 <li class='tab'>
-                  <a href="#contact" ><i class="icon-envelope"></i><span> Contact</span></a>
+                  <a href="#resource" onclick="resource_f1()"><i class="icon-heart"></i><span>Resources </span></a>
+                </li> 
+                <li class='tab'>
+                  <a href="#contact" onclick="contact_f1()"><i class="icon-envelope"></i><span> Contact</span></a>
                 </li>
                 
             </ul>
@@ -89,9 +103,9 @@
                                     <li>
                                         <a href="mailto:krishna.satyapriya123@gmail.com">Request My CV</a>
                                     </li>
-                                    <!-- <li>
-                                        <a href="#portfolio">My Portfolio</a>
-                                    </li> -->
+                                    <li>
+                                        <a href="#resource">Important Links</a>
+                                    </li>
                                     <li>
                                         <a href="#contact">Contact Me</a>
                                     </li>
@@ -298,7 +312,7 @@
                 </div>
               <!-- End Resume Tab Data -->
               <!-- Portfolio Tab Data -->
-                <!-- <div id="portfolio">
+                 <div id="resource">
                     <section class="clearfix">
                         <div class="g1">
                             <div class="image">
@@ -363,7 +377,7 @@
                         </div>
                         
                     </section>
-                </div> --> 
+                </div> 
               <!-- End Portfolio Data -->
               <!-- Contact Tab Data -->
 
