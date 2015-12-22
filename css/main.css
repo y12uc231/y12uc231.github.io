@@ -181,7 +181,6 @@ body {width: 92%; margin: 0 auto} /* Center page without wrapper */
 #header .visible{
   opacity: 1;
 }
-
 /* Tabs */
 .etabs{
   margin: 0;
@@ -198,11 +197,7 @@ body {width: 92%; margin: 0 auto} /* Center page without wrapper */
   box-shadow: 0px 6px #c0392b;
   border-radius: 0px 0px 4px 4px;
 }
-#tab-container{
-  
-  box-shadow: 6px 6px #c0392b;
-  
-}
+
 
 
 .tab {
