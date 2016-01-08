@@ -620,6 +620,17 @@ footer{
   -webkit-border-radius: 4px;
   border-radius: 4px;
 }
+footer2{
+  text-align: center;
+  margin-top: 2em;
+  padding: 10px;
+  background: rgba(255, 255, 255,1);
+  box-shadow: 0px 4px #ccc;
+  color: #333;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+}
 footer p{
   margin-bottom: 0px;
 }
