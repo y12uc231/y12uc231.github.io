@@ -45,7 +45,8 @@
         </header>
         <script>
         function about_f1(){
-            document.title='About';
+            document.title='SPK|Home';
+	    
         }
          function resume_f1(){
             document.title='Resume';
