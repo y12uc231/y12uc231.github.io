@@ -173,11 +173,12 @@ body {width: 92%; margin: 0 auto} /* Center page without wrapper */
 }
 #header #logo{
   text-align: center;
-
+  font-family: "Lucida Console", Courier, monospace;
   display: none;
 }
 #header h4{
-  margin-bottom:0px; 
+  margin-bottom:0px;
+  font-family: 'Life Savers';
 }
 #header .visible{
   opacity: 1;
@@ -247,6 +248,7 @@ body {width: 92%; margin: 0 auto} /* Center page without wrapper */
 
 /* INFO */
 .info-wrap{
+  font-family: "Times New Roman", Times, serif;
 
 }
 /* Photo */
@@ -263,15 +265,20 @@ body {width: 92%; margin: 0 auto} /* Center page without wrapper */
  border-radius: 4px;
  width: 100%;
 }
-.info{
+.info p{
+
+font-family: 'Life Savers';
 
 }
 .info h2, #header h2{
-  text-transform: uppercase;
+  #text-transform: uppercase;
   letter-spacing: 2px;
   margin-bottom: .3em;
+  font-family: 'Life Savers';
 }
 .info h4, #header h4{
+  font-family: "Times New Roman", Times, serif;
+  font-family: "Times New Roman", Times, serif;
   color: #999;
 }
 /* Contact */
@@ -394,6 +401,7 @@ body {width: 92%; margin: 0 auto} /* Center page without wrapper */
   top: 50%;
   display: inline-block;
   margin-top: -20px;
+  font-family: "Times New Roman", Times, serif;
 }
 /* Icon Box */
 .sny-icon{
