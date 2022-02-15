@@ -794,13 +794,13 @@ padding: 9px;
 
 div.blueTable {
   border: 0px solid #1C6EA4;
-  width: 80%;
+  width: 100%;
   text-align: left;
   border-collapse: collapse;
 }
 .divTable.blueTable .divTableCell, .divTable.blueTable .divTableHead {
   border: 0px solid #AAAAAA;
-  padding: 3px 2px;
+  padding: 1px 1px;
 }
 .divTable.blueTable .divTableBody .divTableCell {
   font-size: 15px;
