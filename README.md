@@ -1,4 +1,4 @@
-# Satyapriya Krishna — frontier AI & voice
+# Satyapriya Krishna — frontier intelligence
 
 Static research portfolio for [satyapriyakrishna.com](https://satyapriyakrishna.com), hosted with GitHub Pages.
 
