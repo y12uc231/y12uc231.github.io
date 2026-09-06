@@ -2,7 +2,7 @@
 
 Static research portfolio for [satyapriyakrishna.com](https://satyapriyakrishna.com), hosted with GitHub Pages.
 
-The redesigned page keeps the original photograph in full color and at its natural aspect ratio. It uses a blue, teal, and yellow palette, responsive layouts, native expandable publication/news sections, and keyboard-visible focus styles.
+The redesigned page keeps the original photograph in full color and at its natural aspect ratio. It uses a blue, teal, and yellow palette, responsive layouts, native expandable publication/news sections, and keyboard-visible focus styles. A faint field of flowing connections evolves around the page edges and responds gently to scrolling and the pointer. Motion automatically respects reduced-motion preferences, pauses in hidden tabs, and can be paused from the footer.
 
 ## Update content
 
