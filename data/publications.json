@@ -1,0 +1,144 @@
+[
+  {
+    "title": "TurnBench: A Multi-Domain Benchmark for Turn-Taking Dynamics in Spoken Dialogue",
+    "short": "TurnBench",
+    "venue": "Preprint · 2026",
+    "topic": "Spoken dialogue",
+    "authors": "Freeman Jiang, Ramon Sanabria, Soham Deshmukh, Bandhav Veluri, Simon Michael Vuch Williams, Elliott K. Suen, Garreth Lee, Kevin Yoonho Choi, Takuya Umeki, Riku Kubo, Sathvik Udupa, Chien-yu Huang, Shih-Yun Shan Kuan, Zhuoyan Tao, Satyapriya Krishna, Sefik Emre Eskimez, Yu Tsao, Hung-yi Lee, Shinji Watanabe",
+    "summary": "Knowing when to speak, listen, or yield: evaluating turn-taking across six styles of natural conversation.",
+    "url": "https://arxiv.org/abs/2608.25218",
+    "resource": {
+      "label": "Dataset & leaderboard",
+      "url": "https://turnbench.sesame.com/"
+    },
+    "featured": true
+  },
+  {
+    "title": "Fact, Fetch, and Reason: A Unified Evaluation of Retrieval-Augmented Generation",
+    "short": "FRAMES",
+    "venue": "NAACL 2025",
+    "topic": "Retrieval & reasoning",
+    "authors": "Satyapriya Krishna, Kalpesh Krishna, Anhad Mohananey, Steven Schwarcz, Adam Stambler, Shyam Upadhyay, Manaal Faruqui",
+    "summary": "Evaluating factuality, retrieval, and reasoning together, with questions that require information from multiple sources.",
+    "url": "https://aclanthology.org/2025.naacl-long.243/",
+    "resource": {
+      "label": "Dataset",
+      "url": "https://huggingface.co/datasets/google/frames-benchmark"
+    },
+    "featured": true
+  },
+  {
+    "title": "D-REX: A Benchmark for Detecting Deceptive Reasoning in Large Language Models",
+    "short": "D-REX",
+    "venue": "Preprint · 2025",
+    "topic": "Trustworthy language models",
+    "authors": "Satyapriya Krishna, Andy Zou, Rahul Gupta, Eliot Krzysztof Jones, Nick Winter, Dan Hendrycks, J. Zico Kolter, Matt Fredrikson, Spyros Matsoukas",
+    "summary": "Detecting the gap between apparently benign answers and deceptive reasoning in language models.",
+    "url": "https://arxiv.org/abs/2509.17938",
+    "featured": true
+  },
+  {
+    "title": "Explaining machine learning models with interactive natural language conversations using TalkToModel",
+    "short": "TalkToModel",
+    "venue": "Nature Machine Intelligence · 2023",
+    "topic": "Conversational AI",
+    "authors": "Dylan Slack, Satyapriya Krishna, Himabindu Lakkaraju, Sameer Singh",
+    "summary": "Understanding model predictions through a conversation: explanations, data analysis, and follow-up questions in natural language.",
+    "url": "https://www.nature.com/articles/s42256-023-00692-8",
+    "resource": {
+      "label": "Code & demo",
+      "url": "https://github.com/dylan-slack/TalkToModel"
+    },
+    "featured": true
+  },
+  {
+    "title": "ARES: Adaptive Red-Teaming and End-to-End Repair of Policy-Reward System",
+    "venue": "ACL 2026",
+    "topic": "Model safety",
+    "authors": "Jiacheng Liang, Yao Ma, Tharindu Kumarage, Satyapriya Krishna, Rahul Gupta, Kai-Wei Chang, Aram Galstyan, Charith Peris",
+    "summary": "Finding safety failures shared by a language model and its reward model, then repairing both.",
+    "url": "https://aclanthology.org/2026.acl-long.1985/"
+  },
+  {
+    "title": "From Narrow Unlearning to Emergent Misalignment in LLMs",
+    "venue": "ACL 2026",
+    "topic": "Unlearning & alignment",
+    "authors": "Erum Mushtaq, Anil Ramakrishna, Satyapriya Krishna, Sattvik Sahai, Prasoon Goyal, Kai-Wei Chang, Tao Zhang, Rahul Gupta",
+    "summary": "Studying how removing refusals in one domain can weaken safety in other domains.",
+    "url": "https://aclanthology.org/2026.acl-short.32/"
+  },
+  {
+    "title": "AutoSUIT Bench - Automated Security UnIt Test Benchmark for LLM Coding",
+    "venue": "Findings of ACL 2026",
+    "topic": "Evaluation & security",
+    "authors": "Samuel Osebe, Fan Yang, Junyi Li, Yue Gu, Yongxin Wang, Satyapriya Krishna, Kai-Wei Chang, Aram Galstyan, Rahul Gupta, Weitong Ruan",
+    "summary": "An automatically validated benchmark measuring the security of LLM-generated code across software weakness categories.",
+    "url": "https://aclanthology.org/2026.findings-acl.1735/"
+  },
+  {
+    "title": "Insights from the Inverse: Reconstructing LLM Training Goals Through Inverse Reinforcement Learning",
+    "venue": "COLM 2025",
+    "topic": "Understanding alignment",
+    "authors": "Jared Joselowitz, Ritam Majumdar, Arjun Jagota, Matthieu Bou, Nyal Patel, Satyapriya Krishna, Sonali Parbhoo",
+    "summary": "Recovering reward functions from aligned language models to investigate what their training objectives encode.",
+    "url": "https://openreview.net/forum?id=Bs5Jb285qv"
+  },
+  {
+    "title": "The Disagreement Problem in Explainable Machine Learning: A Practitioner's Perspective",
+    "venue": "TMLR 2024",
+    "topic": "Explainability",
+    "authors": "Satyapriya Krishna, Tessa Han, Alex Gu, Steven Wu, Shahin Jabbari, Himabindu Lakkaraju",
+    "summary": "Measuring how explanation methods disagree, and how practitioners navigate conflicting explanations.",
+    "url": "https://openreview.net/forum?id=jESY2WTZCe"
+  },
+  {
+    "title": "Understanding the Effects of Iterative Prompting on Truthfulness",
+    "venue": "ICML 2024",
+    "topic": "Truthfulness",
+    "authors": "Satyapriya Krishna, Chirag Agarwal, Himabindu Lakkaraju",
+    "summary": "Studying when repeated prompting reduces truthfulness and calibration, and how prompting strategies can help.",
+    "url": "https://proceedings.mlr.press/v235/krishna24a.html"
+  },
+  {
+    "title": "Post Hoc Explanations of Language Models Can Improve Language Models",
+    "short": "AMPLIFY",
+    "venue": "NeurIPS 2023",
+    "topic": "Learning from explanations",
+    "authors": "Satyapriya Krishna, Jiaqi Ma, Dylan Slack, Asma Ghandeharioun, Sameer Singh, Himabindu Lakkaraju",
+    "summary": "Turning model explanations into natural language rationales that help language models correct their mistakes.",
+    "url": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/ce65173b994cf7c925c71b482ee14a8d-Abstract-Conference.html",
+    "featured": false
+  },
+  {
+    "title": "OpenXAI: Towards a Transparent Evaluation of Model Explanations",
+    "venue": "NeurIPS 2022 · Datasets & Benchmarks",
+    "topic": "Open evaluation",
+    "authors": "Chirag Agarwal, Satyapriya Krishna, Eshika Saxena, Martin Pawelczyk, Nari Johnson, Isha Puri, Marinka Zitnik, Himabindu Lakkaraju",
+    "summary": "Tools for comparing the faithfulness, stability, and fairness of model explanations.",
+    "url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/65398a0eba88c9b4a1c38ae405b125ef-Abstract-Datasets_and_Benchmarks.html",
+    "resource": {
+      "label": "Project",
+      "url": "https://open-xai.github.io/"
+    }
+  },
+  {
+    "title": "BOLD: Dataset and Metrics for Measuring Biases in Open-Ended Language Generation",
+    "venue": "ACM FAccT 2021",
+    "topic": "Fairness",
+    "authors": "Jwala Dhamala, Tony Sun, Varun Kumar, Satyapriya Krishna, Yada Pruksachatkun, Kai-Wei Chang, Rahul Gupta",
+    "summary": "A dataset and evaluation metrics for measuring social biases in open-ended language generation.",
+    "url": "https://arxiv.org/abs/2101.11718",
+    "resource": {
+      "label": "Code & data",
+      "url": "https://github.com/amazon-science/bold"
+    }
+  },
+  {
+    "title": "ADePT: Auto-encoder based Differentially Private Text Transformation",
+    "venue": "EACL 2021",
+    "topic": "Privacy",
+    "authors": "Satyapriya Krishna, Rahul Gupta, Christophe Dupuy",
+    "summary": "Exploring text transformations designed to protect privacy while retaining useful semantic information.",
+    "url": "https://aclanthology.org/2021.eacl-main.207/"
+  }
+]
