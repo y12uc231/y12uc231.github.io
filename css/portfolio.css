@@ -917,12 +917,13 @@ details[open]>summary .disclosure-symbol {
 .publication:nth-child(3n) .paper-short {
   color:#9c452b;
 }
-.affiliations>div>span:first-child {
-  color:#087c74;
-}
-.affiliations>div>span:nth-child(2) {
-  color:#3158c9;
-}
+/* Brand-inspired text colors, with deeper tones for small-text contrast. */
+.affiliation-sesame { color:#5b652a; }
+.affiliation-deepmind { color:#1967d2; }
+.affiliation-meta { color:#0866d9; }
+.affiliation-amazon { color:#b54b00; }
+.affiliation-harvard { color:#a51c30; }
+.affiliation-cmu { color:#c41230; }
 .contact-section a:focus-visible {
   outline-color:#ffe88d;
 }
