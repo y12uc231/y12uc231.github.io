@@ -45,7 +45,7 @@
     "authors": "Satyapriya Krishna, Jiaqi Ma, Dylan Slack, Asma Ghandeharioun, Sameer Singh, Himabindu Lakkaraju",
     "summary": "Turning model explanations into natural language rationales that help language models correct their mistakes.",
     "url": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/ce65173b994cf7c925c71b482ee14a8d-Abstract-Conference.html",
-    "featured": true
+    "featured": false
   },
   {
     "title": "Explaining machine learning models with interactive natural language conversations using TalkToModel",
