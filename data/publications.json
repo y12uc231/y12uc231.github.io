@@ -1,5 +1,19 @@
 [
   {
+    "title": "TurnBench: A Multi-Domain Benchmark for Turn-Taking Dynamics in Spoken Dialogue",
+    "short": "TurnBench",
+    "venue": "Preprint · 2026",
+    "topic": "Spoken dialogue",
+    "authors": "Freeman Jiang, Ramon Sanabria, Soham Deshmukh, Bandhav Veluri, Simon Michael Vuch Williams, Elliott K. Suen, Garreth Lee, Kevin Yoonho Choi, Takuya Umeki, Riku Kubo, Sathvik Udupa, Chien-yu Huang, Shih-Yun Shan Kuan, Zhuoyan Tao, Satyapriya Krishna, Sefik Emre Eskimez, Yu Tsao, Hung-yi Lee, Shinji Watanabe",
+    "summary": "Knowing when to speak, listen, or yield: evaluating turn-taking across six styles of natural conversation.",
+    "url": "https://arxiv.org/abs/2608.25218",
+    "resource": {
+      "label": "Dataset & leaderboard",
+      "url": "https://turnbench.sesame.com/"
+    },
+    "featured": true
+  },
+  {
     "title": "Fact, Fetch, and Reason: A Unified Evaluation of Retrieval-Augmented Generation",
     "short": "FRAMES",
     "venue": "NAACL 2025",
@@ -46,20 +60,6 @@
       "url": "https://github.com/dylan-slack/TalkToModel"
     },
     "featured": true
-  },
-  {
-    "title": "TurnBench: A Multi-Domain Benchmark for Turn-Taking Dynamics in Spoken Dialogue",
-    "short": "TurnBench",
-    "venue": "Preprint · 2026",
-    "topic": "Spoken dialogue",
-    "authors": "Freeman Jiang, Ramon Sanabria, Soham Deshmukh, Bandhav Veluri, Simon Michael Vuch Williams, Elliott K. Suen, Garreth Lee, Kevin Yoonho Choi, Takuya Umeki, Riku Kubo, Sathvik Udupa, Chien-yu Huang, Shih-Yun Shan Kuan, Zhuoyan Tao, Satyapriya Krishna, Sefik Emre Eskimez, Yu Tsao, Hung-yi Lee, Shinji Watanabe",
-    "summary": "Knowing when to speak, listen, or yield: evaluating turn-taking across six styles of natural conversation.",
-    "url": "https://arxiv.org/abs/2608.25218",
-    "resource": {
-      "label": "Dataset & leaderboard",
-      "url": "https://turnbench.sesame.com/"
-    },
-    "featured": false
   },
   {
     "title": "ARES: Adaptive Red-Teaming and End-to-End Repair of Policy-Reward System",
