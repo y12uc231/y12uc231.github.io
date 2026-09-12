@@ -2,16 +2,18 @@
 
 Static research portfolio for [satyapriyakrishna.com](https://satyapriyakrishna.com), hosted with GitHub Pages.
 
-The redesigned page keeps the original photograph in full color and at its natural aspect ratio. It uses a blue, teal, and yellow palette, responsive layouts, native expandable publication/news sections, and keyboard-visible focus styles. A faint field of flowing connections evolves around the page edges and responds gently to scrolling and the pointer. Motion automatically respects reduced-motion preferences, pauses in hidden tabs, and can be paused from the footer.
+The page opens with a small explorer walking through a rolling loss landscape, stopping to read and follow new ideas. Fifty attributed quotations rotate every seven seconds, with highlighted phrases and linked sources. Selected work rotates in groups of four, starting with TurnBench; the full publication list stays available below. Hover, keyboard focus, pause controls, reduced-motion preferences, and hidden tabs suspend the relevant motion.
 
 ## Update content
 
 - Edit `index.html` for the introduction, news, biography, and contact information.
 - Edit `data/publications.json` for the selected publications, then run `python3 scripts/build.py` to regenerate the publication section in `index.html`.
+- Edit `data/quotes.json` for quotations, author/source links, and the exact phrases highlighted in each quote; the same build command renders them.
 - Edit `css/portfolio.css` for the design.
+- Edit `js/explorer-world.js` for the landscape and character choreography.
 - The original CV, custom domain, assets, and resource page are retained.
 
-Run `python3 -m http.server 8765 --bind 127.0.0.1` from the repository to preview locally. There are no package dependencies. `python3 scripts/build.py` creates a distributable static copy in `dist/`; the tracked root `index.html` remains directly deployable by GitHub Pages.
+Run `python3 -m http.server 8765 --bind 127.0.0.1` from the repository to preview locally. No package installation is required; Three.js is vendored in `js/vendor/` with its license. `python3 scripts/build.py` creates a distributable static copy in `dist/`; the tracked root `index.html` remains directly deployable by GitHub Pages.
 
 ## Content sources
 
