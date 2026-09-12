@@ -15,9 +15,8 @@ function setup() {
     get classList() { return {add: name => this.classes.add(name), remove: (...names) => names.forEach(n => this.classes.delete(n))}; }
   }));
   const heading = {...events(), matches: () => false, querySelectorAll: () => quotes, contains: node => !!node?.inHeading};
-  const control = {...events(), setAttribute() {}};
   const document = {...events(), hidden: false,
-    querySelector: selector => selector === '#opening-line' ? heading : control};
+    querySelector: selector => selector === '#opening-line' ? heading : null};
   const reduced = {...events(), matches: false};
   let observer, now = 0, id = 0;
   const timers = new Map();
@@ -36,7 +35,7 @@ function setup() {
     }
     now = end;
   };
-  return {quotes, heading, control, document, reduced, tick,
+  return {quotes, heading, document, reduced, tick,
     active: () => quotes.findIndex(quote => !quote.hidden),
     visible: value => observer([{isIntersecting: value}])};
 }
@@ -61,15 +60,12 @@ test('hover during a fade restores the current quote; focus continues to hold it
   s.heading.dispatchEvent({type: 'focusout'}); s.tick(7000); assert.equal(s.active(), 1);
 });
 
-test('the shared pause button broadcasts and honors the opening motion state', () => {
+test('quotes honor motion state from the explorer without a separate button', () => {
   const s = setup(); s.visible(true);
-  let paused;
-  s.document.addEventListener('sk-motion-change', event => { paused = event.detail.paused; });
-  s.control.dispatchEvent({type: 'click'});
-  assert.equal(paused, true); assert.equal(s.control.textContent, 'Resume');
-  s.tick(20000); assert.equal(s.active(), 0);
-  s.control.dispatchEvent({type: 'click'});
-  assert.equal(paused, false); s.tick(7000); assert.equal(s.active(), 1);
+  s.document.dispatchEvent({type:'sk-motion-change',detail:{paused:true}});
+  s.tick(20000); assert.equal(s.active(),0);
+  s.document.dispatchEvent({type:'sk-motion-change',detail:{paused:false}});
+  s.tick(7000); assert.equal(s.active(),1);
 });
 
 test('an attribution link retains keyboard focus without rotating away', () => {
@@ -87,7 +83,7 @@ test('offscreen and reduced-motion states suspend rotation without catching up',
   const s = setup(); s.tick(20000); assert.equal(s.active(), 0);
   s.visible(true); s.tick(6700);
   s.reduced.matches = true; s.reduced.dispatchEvent({type: 'change'});
-  s.tick(20000); assert.equal(s.active(), 0); assert.equal(s.control.hidden, true);
+  s.tick(20000); assert.equal(s.active(), 0);
   s.reduced.matches = false; s.reduced.dispatchEvent({type: 'change'});
   s.tick(6999); assert.equal(s.active(), 0);
   s.tick(1); assert.equal(s.active(), 1);

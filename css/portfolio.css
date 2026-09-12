@@ -31,8 +31,7 @@ nav { display:flex; gap:28px; font-size:13px; color:var(--muted); }
 .loss-explorer { width:100%; margin:0; position:relative; }
 .explorer-stage { position:relative; width:100%; height:clamp(330px,44vw,510px); isolation:isolate; }
 .loss-surface { display:block; width:100%; height:100%; }
-.loss-explorer figcaption { position:absolute; right:8%; bottom:12px; display:flex; justify-content:flex-end; }
-.explorer-pause { font:400 12px/1.5 var(--body); color:var(--muted); background:none; border:0; border-bottom:1px solid var(--line); padding:3px 0; cursor:pointer; }
+.loss-surface:focus-visible { outline:1px solid #b8cebf; outline-offset:-6px; }
 .introduction { max-width:650px; text-align:center; padding:8px 0 45px; }
 .introduction>p { font-size:17px; line-height:1.8; margin:0 0 16px; text-wrap:pretty; }
 .personal-links { display:flex; justify-content:center; flex-wrap:wrap; gap:25px; font-size:13px; color:var(--accent); }
@@ -41,7 +40,6 @@ nav { display:flex; gap:28px; font-size:13px; color:var(--muted); }
 .section-heading { display:flex; align-items:baseline; justify-content:space-between; gap:20px; margin-bottom:5px; }
 h2 { font:550 19px/1.5 var(--display); letter-spacing:-.45px; margin:0; }
 .section-heading>span { font:italic 13px/1.5 Georgia,serif; color:var(--muted); }
-.papers-pause { color:var(--muted); font:400 12px/1.5 var(--body); background:none; border:0; border-bottom:1px solid var(--line); padding:4px 0; cursor:pointer; }
 .paper-rotation { display:grid; }
 .paper-set { grid-area:1/1; align-self:start; min-width:0; transition:opacity 420ms ease,transform 420ms ease; }
 /* Hidden sets still reserve their space, keeping every rotation the same height. */
@@ -112,7 +110,7 @@ summary::-webkit-details-marker { display:none; }
  .wrap { width:calc(100% - 40px); } .narrow { width:calc(100% - 40px); }
  .site-header { height:76px; } nav { gap:16px; font-size:12px; }
  .opening { margin-top:18px; }
- .explorer-stage { height:340px; } .loss-explorer figcaption { bottom:8px; }
+ .explorer-stage { height:340px; }
  .introduction { padding-top:15px; padding-bottom:36px; } .introduction>p { font-size:16px; }
  .research { padding-top:18px; } .section-heading>span { display:none; }
  .publication h3 { font-size:17px; } .publication { padding-block:21px; }

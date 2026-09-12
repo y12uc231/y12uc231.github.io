@@ -2,7 +2,7 @@
 
 Static research portfolio for [satyapriyakrishna.com](https://satyapriyakrishna.com), hosted with GitHub Pages.
 
-The page opens with a small explorer walking through a rolling loss landscape, stopping to read and follow new ideas. Fifty attributed quotations rotate every seven seconds, with highlighted phrases and linked sources. Selected work rotates in groups of four, starting with TurnBench; the full publication list stays available below. Hover, keyboard focus, pause controls, reduced-motion preferences, and hidden tabs suspend the relevant motion.
+The page opens with a small explorer walking through a rolling loss landscape, stopping to read and follow new ideas. Fifty attributed quotations rotate every seven seconds, with highlighted phrases and linked sources. Selected work rotates in groups of four, starting with TurnBench; the full publication list stays available below. Hover, keyboard focus, reduced-motion preferences, and hidden tabs suspend the relevant motion. Clicking the scene or activating it with the keyboard pauses or resumes the explorer and quotes.
 
 ## Update content
 

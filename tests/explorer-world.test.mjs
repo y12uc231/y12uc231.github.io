@@ -6,11 +6,11 @@ import * as THREE from '../js/vendor/three.module.min.js';
 
 // Exercise the actual geometry and choreography without requiring a GPU or browser.
 function scene(reducedMotion = false) {
-  const button = {setAttribute() {}, addEventListener() {}};
+  const events=()=>({listeners:{},addEventListener(name,fn){(this.listeners[name]??=[]).push(fn);},dispatchEvent(event){this.listeners[event.type]?.forEach(fn=>fn(event));}});
   const thought = {style: {setProperty() {}}, addEventListener() {}};
-  const canvas = {clientWidth: 1000, clientHeight: 500};
+  const canvas = {...events(),attributes:{},setAttribute(name,value){this.attributes[name]=value;},clientWidth: 1000, clientHeight: 500};
   const host = {classList: {add() {}}, querySelector: selector =>
-    selector === '.loss-surface' ? canvas : selector === '.explorer-thought' ? thought : button};
+    selector === '.loss-surface' ? canvas : selector === '.explorer-thought' ? thought : null};
   let frames = 0;
   class Renderer {
     constructor() { this.shadowMap = {}; }
@@ -19,7 +19,8 @@ function scene(reducedMotion = false) {
   }
   const context = {
     THREE: {...THREE, WebGLRenderer: Renderer}, devicePixelRatio: 1,
-    document: {hidden: false, querySelector: () => host, addEventListener() {}},
+    document: {...events(),hidden: false, querySelector: () => host},
+    CustomEvent: class {constructor(type,options){this.type=type;Object.assign(this,options);}},
     matchMedia: () => ({matches: reducedMotion, addEventListener() {}}),
     localStorage: {getItem: () => 'true'}, // An old pause must not stall a fresh visit.
     requestAnimationFrame: () => ++frames, cancelAnimationFrame() {},
@@ -31,7 +32,7 @@ function scene(reducedMotion = false) {
     "globalThis.rig={pose,phaseAt,heightAt,actor,head,book,world,camera,ground,timetable,total,walkingFoot,routeLengths,CHARACTER_SCALE,legs,arms};host.classList.add('world-ready');draw();sync();");
   vm.runInNewContext(source, context);
   assert(context.rig, 'The scene must initialize');
-  return {...context.rig, frames, thought};
+  return {...context.rig, frames, thought, canvas};
 }
 
 function exposure(rig, group) {
@@ -92,6 +93,12 @@ test('the complete walk preserves limb lengths and keeps foot contacts above ter
       assert(Math.abs(joint.distanceTo(end) - limb.lowerLength) < .0001, `Unreachable lower limb at ${time}`);
       assert(limb.shape.mesh.geometry.attributes.position.array.every(Number.isFinite));
     }
+    for(const leg of rig.legs) {
+      const [hip,knee,ankle]=leg.shape.joints;
+      const flex=hip.clone().sub(knee).normalize().dot(ankle.clone().sub(knee).normalize());
+      const degrees=180-Math.acos(Math.max(-1,Math.min(1,flex)))*180/Math.PI;
+      assert(degrees<110,`Knee folds excessively at ${time}`);
+    }
   }
   for (let route = 0; route < rig.routeLengths.length; route++) {
     for (let distance = 0; distance < rig.routeLengths[route]; distance += .01) {
@@ -126,7 +133,7 @@ test('walking arms hang almost straight without flaring sideways', () => {
         rig.pose(time + age);
         for (const arm of rig.arms) {
           const [shoulder, elbow, wrist] = arm.shape.joints;
-          assert(shoulder.distanceTo(wrist) / (arm.upperLength + arm.lowerLength) > .96);
+          assert(shoulder.distanceTo(wrist) / (arm.upperLength + arm.lowerLength) > .998);
           assert(Math.abs(elbow.x - shoulder.x) < .028, 'Elbow flares out');
           assert(shoulder.y - wrist.y > .32);
           const fingers=new THREE.Vector3(0,-1,0).applyQuaternion(arm.hand.quaternion);
@@ -139,6 +146,58 @@ test('walking arms hang almost straight without flaring sideways', () => {
     }
     time += stage.duration;
   }
+});
+
+test('limbs stay straight between joints throughout walking and reading', () => {
+  for(let time=0;time<rig.total;time+=.25) {
+    rig.pose(time);
+    for(const arm of [...rig.arms,...rig.legs]) {
+      const positions=arm.shape.mesh.geometry.attributes.position;
+      const [shoulder,elbow,wrist]=arm.shape.joints;
+      for(const [start,end,first,last] of [[shoulder,elbow,2,8],[elbow,wrist,12,18]]) {
+        const axis=end.clone().sub(start).normalize();
+        for(let ring=first;ring<=last;ring++) {
+          const center=new THREE.Vector3();
+          for(let j=0;j<12;j++) center.add(new THREE.Vector3().fromBufferAttribute(positions,ring*13+j));
+          center.divideScalar(12).sub(start);
+          assert(center.clone().addScaledVector(axis,-center.dot(axis)).length()<.000001, 'Limb bends between joints');
+        }
+      }
+    }
+  }
+});
+
+test('the open pages face the reader and his gaze lowers toward the book',()=>{
+  let time=0;
+  for(const stage of rig.timetable) {
+    if(stage.kind==='read') {
+      rig.pose(time+3);
+      const pages=new THREE.Vector3(0,0,1).applyEuler(rig.book.rotation);
+      const towardFace=rig.head.position.clone().sub(rig.book.position).normalize();
+      assert(pages.dot(towardFace)>.9,'Pages face away from the reader');
+      assert(rig.head.rotation.x>.7,'Reader is looking over the book');
+    }
+    time+=stage.duration;
+  }
+});
+
+test('reading and book transitions keep elbows low and near the body',()=>{
+  for(let time=0;time<rig.total;time+=.08) {
+    if(rig.phaseAt(time).kind!=='read')continue;
+    rig.pose(time);
+    for(const arm of rig.arms) {
+      const [shoulder,elbow]=arm.shape.joints;
+      assert(arm.side*(elbow.x-shoulder.x)<.04,`Elbow flares outward at ${time}`);
+      assert(shoulder.y-elbow.y>.10,`Elbow rises to shoulder height at ${time}`);
+    }
+  }
+});
+
+test('the scene can pause by click or keyboard without a visible control',()=>{
+  rig.canvas.dispatchEvent({type:'click'});
+  assert.equal(rig.canvas.attributes['aria-pressed'],'true');
+  rig.canvas.dispatchEvent({type:'keydown',key:' ',preventDefault(){}});
+  assert.equal(rig.canvas.attributes['aria-pressed'],'false');
 });
 
 test('reduced motion keeps a visible, static reader', () => {

@@ -1,6 +1,5 @@
 const heading = document.querySelector('#opening-line');
-const control = document.querySelector('.explorer-pause');
-if (heading && control) {
+if (heading) {
   const quotes = [...heading.querySelectorAll('.opening-quote')];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const PERIOD = 7000, FADE = 400;
@@ -16,9 +15,6 @@ if (heading && control) {
   }
   function schedule() {
     cancel();
-    control.hidden = reduced.matches;
-    control.textContent = paused ? 'Resume' : 'Pause';
-    control.setAttribute('aria-label', paused ? 'Resume the explorer and quotes' : 'Pause the explorer and quotes');
     if (canRun()) timer = setTimeout(advance, PERIOD - FADE);
   }
   function advance() {
@@ -47,10 +43,6 @@ if (heading && control) {
   heading.addEventListener('focusin', () => { focused = true; schedule(); });
   heading.addEventListener('focusout', () => {
     queueMicrotask(() => { focused = heading.contains(document.activeElement); schedule(); });
-  });
-  control.addEventListener('click', () => {
-    paused = !paused;
-    document.dispatchEvent(new CustomEvent('sk-motion-change', {detail: {paused}}));
   });
   document.addEventListener('sk-motion-change', event => { paused = event.detail.paused; schedule(); });
   document.addEventListener('visibilitychange', schedule);

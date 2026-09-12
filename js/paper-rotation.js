@@ -2,15 +2,14 @@ const research = document.querySelector('#research');
 if (research) {
   const stage = research.querySelector('.paper-rotation');
   const groups = [...stage.querySelectorAll('.paper-set')];
-  const button = research.querySelector('.papers-pause');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const HOLD = 5000, FADE = 320;
   let index = 0, timer = 0, swapTimer = 0;
   let hovered = research.matches(':hover'), focused = false;
-  let visible = false, paused = false;
+  let visible = false;
 
   const canRotate = () => groups.length > 1 && visible && !document.hidden &&
-    !reduced.matches && !paused && !hovered && !focused &&
+    !reduced.matches && !hovered && !focused &&
     !research.contains(document.activeElement) && !groups[index].querySelector('details[open]') &&
     !research.querySelector('.publication-details').open;
 
@@ -24,9 +23,6 @@ if (research) {
 
   function schedule() {
     cancel();
-    button.hidden = reduced.matches || groups.length < 2;
-    button.textContent = paused ? 'Resume' : 'Pause';
-    button.setAttribute('aria-label', paused ? 'Resume paper rotation' : 'Pause paper rotation');
     if (canRotate()) timer = setTimeout(advance, HOLD);
   }
 
@@ -62,7 +58,6 @@ if (research) {
   });
   // Native Details events do not bubble; capture preserves any open paper.
   research.addEventListener('toggle', schedule, true);
-  button.addEventListener('click', () => { paused = !paused; schedule(); });
   document.addEventListener('visibilitychange', schedule);
   reduced.addEventListener('change', schedule);
   new IntersectionObserver(entries => {

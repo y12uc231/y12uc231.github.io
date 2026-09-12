@@ -12,11 +12,10 @@ function setup() {
     getBoundingClientRect() { return {}; },
     get classList() { return {add: name => this.classes.add(name), remove: (...names) => names.forEach(n => this.classes.delete(n))}; }
   }));
-  const button = {...events(), setAttribute() {}};
   const stage = {querySelectorAll: () => groups};
   const research = {...events(), open: false, matches: () => false,
     contains: node => !!node?.inside,
-    querySelector: selector => ({'.paper-rotation': stage, '.papers-pause': button, '.publication-details': research}[selector])};
+    querySelector: selector => ({'.paper-rotation': stage, '.publication-details': research}[selector])};
   const document = {...events(), hidden: false, activeElement: null, querySelector: () => research};
   const reduced = {...events(), matches: false};
   let observer, now = 0, id = 0;
@@ -38,7 +37,7 @@ function setup() {
   const active = () => groups.findIndex(group => !group.hidden);
   const emit = (name, data = {}) => research.listeners[name](data);
   const visible = value => observer([{isIntersecting: value}]);
-  return {groups, button, research, document, reduced, tick, active, emit, visible};
+  return {groups, research, document, reduced, tick, active, emit, visible};
 }
 
 test('four sets cycle in order; only the current set is interactive', () => {
@@ -78,13 +77,6 @@ test('closing All papers resumes even if a nested disclosure remains open', () =
   s.research.nestedOpen = true; s.tick(10000); assert.equal(s.active(), 0);
   s.research.open = false; s.emit('toggle'); s.tick(5320);
   assert.equal(s.active(), 1);
-});
-
-test('manual pause survives hover and visibility changes', () => {
-  const s = setup(); s.visible(true); s.button.listeners.click();
-  s.emit('pointerenter'); s.emit('pointerleave'); s.visible(false); s.visible(true);
-  s.tick(10000); assert.equal(s.active(), 0); assert.equal(s.button.textContent, 'Resume');
-  s.button.listeners.click(); s.tick(5320); assert.equal(s.active(), 1);
 });
 
 test('hidden tabs, offscreen lists and reduced motion cancel pending fades', () => {

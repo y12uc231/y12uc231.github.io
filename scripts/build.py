@@ -23,7 +23,7 @@ def quotation(q, i):
     return f'<span class="opening-quote" data-tone="{author_tones[q["author"]]}"{hidden}>“{line}”{author}</span>'
 
 def external(url, label, cls=''):
-    return f'<a class="{cls}" href="{escape(url, quote=True)}" target="_blank" rel="noopener noreferrer">{label} <span aria-hidden="true">↗</span></a>'
+    return f'<a class="{cls}" href="{escape(url, quote=True)}" target="_blank" rel="noopener noreferrer">{label}</a>'
 def publication(p, i):
     authors = escape(p['authors']).replace('Satyapriya Krishna', '<strong>Satyapriya Krishna</strong>')
     resource = external(p['resource']['url'], escape(p['resource']['label']), 'paper-resource') if p.get('resource') else ''

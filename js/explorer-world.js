@@ -104,17 +104,28 @@ function initialize() {
   // Adult proportions: long legs, a small jawed head, and tailored clothing.
   const torso=profile(actor,[[-.13,.080,.052],[-.11,.094,.055],[-.035,.091,.056,.005],[.07,.116,.060],[.107,.110,.055],[.132,.053,.032],[.138,.026,.027]],shirt);
   const pelvis=ellipsoid(actor,[.093,.065,.060],trousers);
-  const neck=ellipsoid(actor,[.025,.039,.027]);
+  const neck=profile(actor,[[-.035,.029,.028],[.030,.023,.024]],skin);
   const seamMaterial=new THREE.MeshStandardMaterial({color:0x4d687d,roughness:1});
   const seam=box(torso,[.0025,.195,.002],seamMaterial);seam.position.set(0,-.025,.060);
   for(const y of [-.085,-.025,.035]) {const button=ellipsoid(torso,[.003,.003,.002],seamMaterial);button.position.set(0,y,.064);}
   const head=new THREE.Group();actor.add(head);
   profile(head,[[-.065,.019,.022,.010],[-.049,.037,.032,.006],[-.018,.048,.043,.003],[.012,.052,.047],[.041,.045,.041,-.003],[.061,.021,.023,-.003],[.065,.001,.001,-.003]],skin);
+  function roundedFrame(path,w,h,r) {
+    const x=w/2,y=h/2;
+    path.moveTo(-x+r,-y);path.lineTo(x-r,-y);path.quadraticCurveTo(x,-y,x,-y+r);
+    path.lineTo(x,y-r);path.quadraticCurveTo(x,y,x-r,y);
+    path.lineTo(-x+r,y);path.quadraticCurveTo(-x,y,-x,y-r);
+    path.lineTo(-x,-y+r);path.quadraticCurveTo(-x,-y,-x+r,-y);
+    return path;
+  }
+  const frameShape=roundedFrame(new THREE.Shape(),.040,.025,.0035);
+  frameShape.holes.push(roundedFrame(new THREE.Path(),.0345,.0195,.002));
+  const frameGeometry=new THREE.ExtrudeGeometry(frameShape,{depth:.002,bevelEnabled:false,curveSegments:4});
   for(const side of [-1,1]) {
     const ear=ellipsoid(head,[.009,.015,.010]);ear.position.set(side*.051,-.009,-.003);
-    const rim=new THREE.Mesh(new THREE.TorusGeometry(.0155,.0022,8,24),eyeMaterial);
-    rim.position.set(side*.020,.006,.048);rim.scale.y=.84;head.add(rim);
-    const temple=box(head,[.0025,.0025,.041],eyeMaterial);temple.position.set(side*.036,.006,.029);
+    const rim=new THREE.Mesh(frameGeometry,eyeMaterial);
+    rim.position.set(side*.022,.006,.048);head.add(rim);
+    const temple=box(head,[.0025,.0025,.041],eyeMaterial);temple.position.set(side*.041,.006,.029);
   }
   const bridge=box(head,[.010,.0025,.003],eyeMaterial);bridge.position.set(0,.009,.049);
   const nose=ellipsoid(head,[.007,.012,.012]);nose.position.set(0,-.009,.048);
@@ -125,8 +136,9 @@ function initialize() {
     const e=ellipsoid(head,[.0038,.004,.002],eyeMaterial);e.position.set(x,.005,.045);return e;
   });
   // A continuous cloth surface bends around each joint instead of exposed ball joints.
-  function clothedLimb(material,widths) {
-    const ringCount=13,sides=12,joints=[V(),V(),V()],curve=new THREE.CatmullRomCurve3(joints,false,'centripetal');
+  function clothedLimb(material,widths,hinged=false) {
+    const ringCount=hinged?19:13,sides=12,joints=[V(),V(),V()];
+    const curve=hinged?null:new THREE.CatmullRomCurve3(joints,false,'centripetal');
     const geometry=new THREE.BufferGeometry(),positions=new THREE.Float32BufferAttribute(new Float32Array(ringCount*(sides+1)*3),3),indices=[];
     geometry.setAttribute('position',positions);
     for(let i=0;i<ringCount-1;i++)for(let j=0;j<sides;j++) {const a=i*(sides+1)+j,b=a+sides+1;indices.push(a,b,b+1,a,b+1,a+1);}
@@ -134,12 +146,25 @@ function initialize() {
     const mesh=new THREE.Mesh(geometry,material);mesh.castShadow=true;mesh.receiveShadow=true;actor.add(mesh);
     return {joints,mesh,update(from,joint,to) {
       joints[0].copy(from);joints[1].copy(joint);joints[2].copy(to);
+      const upper=joint.clone().sub(from).normalize(),lower=to.clone().sub(joint).normalize();
+      const before=joint.clone().addScaledVector(upper,-.014),after=joint.clone().addScaledVector(lower,.014);
       for(let i=0;i<ringCount;i++) {
-        const t=i/(ringCount-1),center=curve.getPoint(t),tangent=curve.getTangent(t).normalize();
+        const t=hinged?Math.max(0,i-2)/(ringCount-3):i/(ringCount-1);
+        let center,tangent,cap=1;
+        if(!hinged) {center=curve.getPoint(t);tangent=curve.getTangent(t).normalize();}
+        else if(i<2) {center=from.clone().addScaledVector(upper,i===0?-.020:-.013);tangent=upper;cap=i===0?.025:.76;}
+        else if(i<=8) {center=from.clone().lerp(before,(i-2)/6);tangent=upper;}
+        else if(i>=12) {center=after.clone().lerp(to,(i-12)/6);tangent=lower;}
+        else {
+          // Only the fabric at the elbow flexes; both limb shafts stay straight.
+          const bend=(i-8)/4;
+          center=before.clone().multiplyScalar((1-bend)**2).addScaledVector(joint,2*bend*(1-bend)).addScaledVector(after,bend*bend);
+          tangent=upper.clone().lerp(lower,bend).normalize();
+        }
         let x=V(1,0,0).addScaledVector(tangent,-tangent.x);
         if(x.lengthSq()<.01)x=V(0,0,1).addScaledVector(tangent,-tangent.z);
         x.normalize();const z=x.clone().cross(tangent).normalize();
-        const at=t*(widths.length-1),k=Math.min(widths.length-2,Math.floor(at)),radius=mix(widths[k],widths[k+1],at-k);
+        const at=t*(widths.length-1),k=Math.min(widths.length-2,Math.floor(at)),radius=mix(widths[k],widths[k+1],at-k)*cap;
         for(let j=0;j<=sides;j++) {const angle=j/sides*Math.PI*2;const p=center.clone().addScaledVector(x,radius*Math.cos(angle)).addScaledVector(z,radius*.86*Math.sin(angle));positions.setXYZ(i*(sides+1)+j,p.x,p.y,p.z);}
       }
       positions.needsUpdate=true;geometry.computeVertexNormals();geometry.computeBoundingSphere();
@@ -161,13 +186,19 @@ function initialize() {
     const b=Math.sqrt(Math.max(0,l1*l1-a*a));
     return from.clone().addScaledVector(axis,a).addScaledVector(bend,b);
   }
-  const legs=[-1,1].map(side=>({side,upperLength:.225,lowerLength:.220,shape:clothedLimb(trousers,[.042,.037,.026,.031,.022]),foot:ellipsoid(actor,[.030,.027,.063],shoes)}));
-  const arms=[-1,1].map(side=>({side,upperLength:.170,lowerLength:.165,shape:clothedLimb(shirt,[.034,.031,.022,.025,.018]),hand:hand(side)}));
+  const legs=[-1,1].map(side=>({side,upperLength:.225,lowerLength:.220,shape:clothedLimb(trousers,[.042,.037,.030,.026,.022],true),foot:ellipsoid(actor,[.030,.027,.063],shoes)}));
+  const arms=[-1,1].map(side=>({side,upperLength:.170,lowerLength:.165,shape:clothedLimb(shirt,[.031,.030,.026,.022,.0175],true),hand:hand(side)}));
   const book=new THREE.Group();actor.add(book);
+  const ink=new THREE.MeshStandardMaterial({color:0x8c9d90,roughness:1});
   const bookSides=[-1,1].map(side=>{
     const hinge=new THREE.Group();book.add(hinge);
     const cover=box(hinge,[.102,.147,.012],coverMaterial);cover.position.set(side*.051,0,-.008);
     const pages=box(hinge,[.095,.134,.012],pageMaterial);pages.position.set(side*.049,0,.005);
+    for(let line=0;line<8;line++) {
+      const width=line===0?.041:line===7?.047:.069;
+      const print=box(hinge,[width,line===0?.0024:.0014,.0006],ink);
+      print.position.set(side*.049,.046-line*.0105,.0118);
+    }
     return {hinge,side};
   });
   const turningPage=new THREE.Group();book.add(turningPage);
@@ -177,7 +208,7 @@ function initialize() {
 
   const aligned=(r,s)=>V((7*r+9*s)/Math.sqrt(130),0,(9*r-7*s)/Math.sqrt(130));
   // Start just behind a nearby crest, already walking around its edge.
-  const anchors=[[-1.1,.1],[-1.1,-.9],[-.2,-2],[1.25,-2],[2.2,-.35],[1.6,.1],[2.2,1.4],[.6,2.3],[-.8,2.5],[-2.1,1.8],[-2.5,.6],[-1.1,1.1]].map(([r,s])=>aligned(r,s));
+  const anchors=[[-1.1,.02],[-1.1,-.9],[-.2,-2],[1.25,-2],[2.2,-.35],[1.6,.1],[2.2,1.4],[.6,2.3],[-.8,2.5],[-2.1,1.8],[-2.5,.6],[-1.1,1.1]].map(([r,s])=>aligned(r,s));
   const boundaries=[0,1,4,6,8,10,12];
   const places=boundaries.slice(0,-1).map(i=>anchors[i]);
   const routes=boundaries.slice(0,-1).map((start,i)=>{
@@ -191,17 +222,35 @@ function initialize() {
     }
     return path;
   });
-  const routeLengths=routes.map(r=>r.getLength());
-  const strides=routeLengths.map(l=>l/Math.ceil(l/(.30*CHARACTER_SCALE)));
+  // Measure steps along the actual terrain, including its vertical rise and fall.
+  const routeMaps=routes.map(route=>{
+    const samples=[{u:0,d:0}];
+    let previous=route.getPointAt(0),distance=0;
+    previous.y=heightAt(previous.x,previous.z);
+    for(let i=1;i<=400;i++) {
+      const u=i/400,point=route.getPointAt(u);
+      point.y=heightAt(point.x,point.z);distance+=point.distanceTo(previous);
+      samples.push({u,d:distance});previous=point;
+    }
+    return samples;
+  });
+  const routeLengths=routeMaps.map(map=>map[map.length-1].d);
+  const strides=routeLengths.map(l=>l/Math.ceil(l/(.20*CHARACTER_SCALE)));
   function routePoint(route,distance) {
-    const u=THREE.MathUtils.clamp(distance/routeLengths[route],0,1);
+    const map=routeMaps[route],target=THREE.MathUtils.clamp(distance,0,routeLengths[route]);
+    let low=0,high=map.length-1;
+    while(high-low>1){const mid=(low+high)>>1;if(map[mid].d<target)low=mid;else high=mid;}
+    const u=mix(map[low].u,map[high].u,(target-map[low].d)/(map[high].d-map[low].d));
     const point=routes[route].getPointAt(u),direction=routes[route].getTangentAt(u).normalize();
     point.y=heightAt(point.x,point.z);
     return {point,direction};
   }
   function contact(route,distance,side) {
     const {point,direction}=routePoint(route,distance);
-    point.add(V(direction.z,0,-direction.x).multiplyScalar(side*.057*CHARACTER_SCALE));
+    const normal=normalAt(point.x,point.z);
+    const crossSlope=-(normal.x*direction.z-normal.z*direction.x)/normal.y;
+    const width=.04*CHARACTER_SCALE/Math.sqrt(1+crossSlope*crossSlope);
+    point.add(V(direction.z,0,-direction.x).multiplyScalar(side*width));
     point.y=heightAt(point.x,point.z)+.035*CHARACTER_SCALE;
     return {point,normal:normalAt(point.x,point.z),direction};
   }
@@ -217,7 +266,7 @@ function initialize() {
   }
   const timetable=[];
   routes.forEach((route,i)=>{
-    timetable.push({kind:'walk',duration:Math.max(4.8,routeLengths[i]/.205),route:i,alreadyWalking:i===0});
+    timetable.push({kind:'walk',duration:Math.max(4.8,routeLengths[i]/(.205*.20/.30)),route:i,alreadyWalking:i===0});
     if(i<routes.length-1)timetable.push({kind:'read',duration:10.8,place:i+1,route:i});
   });
   const total=timetable.reduce((sum,s)=>sum+s.duration,0);
@@ -265,11 +314,12 @@ function initialize() {
     torso.position.set(weight,hip+.133+breath,.003);
     const chestTurn=reading?THREE.MathUtils.clamp(angleMix(heading,cameraYaw,1)-heading,-.20,.20)*settled:0;
     const chestLift=reading?smooth((state.t-6.35)/.8)*(1-smooth((state.t-8.15)/.7)):0;
-    torso.rotation.set(.035-.020*chestLift,chestTurn,-roll-.018*settled);
+    torso.rotation.set(.035+.055*openBook-.040*chestLift,chestTurn,-roll-.018*settled);
     pelvis.position.set(weight,hip,0);pelvis.rotation.z=roll*.5;
-    neck.position.set(weight,hip+.282+breath,.007);
-    head.position.set(weight*.8,hip+.365+breath,.010);
-    head.rotation.set(.025+.31*openBook-.39*discovery,aheadTurn*.6+chestTurn+.10*discovery,-.008+.032*discovery+roll*.20);
+    neck.position.set(weight,hip+.289+breath,.007);
+    head.rotation.set(.025+.76*openBook-.75*discovery,aheadTurn*.6+chestTurn+.10*discovery,-.008+.032*discovery+roll*.20);
+    // Nod around the neck attachment, so the skull moves forward as the chin lowers.
+    head.position.set(weight*.8,hip+.318+breath,.007).add(V(0,.047,.003).applyEuler(head.rotation));
     const blinkTime=time%24.6,blinkAt=[2.9,7.2,7.65,14.8,21.6];
     const closure=Math.max(...blinkAt.map(t=>Math.exp(-(((blinkTime-t)/.075)**2))));
     eyes.forEach(e=>e.scale.y=.004*(1-.94*closure));
@@ -286,9 +336,9 @@ function initialize() {
       leg.foot.position.addScaledVector(z,.026);
     }
     // The book follows the left hand out of the pocket, then opens for both hands.
-    const pocket=V(weight-.086,hip+.025,.055),readingPosition=V(weight+.008,hip+.16,.175);
+    const pocket=V(weight-.086,hip+.025,.055),readingPosition=V(weight+.008,hip+.18,.175);
     book.position.copy(pocket).lerp(readingPosition,bookOut);
-    book.rotation.set(mix(.04,-.57,openBook),-.15*(1-bookOut),-.10*(1-bookOut));
+    book.rotation.set(mix(.04,-2.02,openBook),-.15*(1-bookOut),-.10*(1-bookOut));
     book.visible=bookOut>.008;
     const opening=mix(1.43,.20,openBook);
     bookSides.forEach(({hinge,side})=>hinge.rotation.y=-side*opening);
@@ -297,8 +347,11 @@ function initialize() {
     turningPage.rotation.y=-.2-pageTurn*(Math.PI-.4);
     for(const arm of arms) {
       const shoulder=V(arm.side*.107,.105,0).applyEuler(torso.rotation).add(torso.position);
-      const swing=.035*Math.sin(gait+arm.side*Math.PI/2)*motion;
-      const relaxed=shoulder.clone().add(V(arm.side*.008,-.326,.012+swing));
+      // Swing the whole arm from its shoulder, with a small, constant elbow bend.
+      const swing=.09*Math.sin(gait+arm.side*Math.PI/2)*motion;
+      const upper=V(arm.side*.025,-1,0).normalize().applyAxisAngle(V(1,0,0),-swing);
+      const lower=upper.clone().applyAxisAngle(V(1,0,0),-.07);
+      const relaxed=shoulder.clone().addScaledVector(upper,arm.upperLength).addScaledVector(lower,arm.lowerLength);
       const holding=V(arm.side*mix(.018,.105,openBook),-.007,.018).applyEuler(book.rotation).add(book.position);
       if(arm.side>0&&reading) {
         const turning=smooth((state.t-3.35)/.35)*(1-smooth((state.t-4.65)/.45));
@@ -308,7 +361,9 @@ function initialize() {
       const reach=reading?smooth((state.t-.25)/.5)*(1-smooth((state.t-9.6)/.75)):0;
       const grip=arm.side<0?Math.max(bookOut,reach):bookOut*openBook;
       const hand=relaxed.lerp(holding,grip);
-      const elbow=solveIK(shoulder,hand,arm.upperLength,arm.lowerLength,V(arm.side*mix(.08,.55,grip),.03,mix(.9,.35,grip)));
+      const readingPole=V(arm.side*.15,-1,.10).applyEuler(torso.rotation);
+      const pole=V(0,0,-1).lerp(readingPole,arm.side<0?bookOut:grip);
+      const elbow=solveIK(shoulder,hand,arm.upperLength,arm.lowerLength,pole);
       arm.shape.update(shoulder,elbow,hand);arm.hand.position.copy(hand);
       // Keep the wrist continuous with the forearm; the thumb points forward on a relaxed hand.
       const forearm=hand.clone().sub(elbow).normalize();
@@ -356,7 +411,6 @@ function initialize() {
   let elapsed=0,last=0,raf=0,lastDraw=0,visible=true,paused=false,readingThought=false;
   let hoveredThought=false,focusedThought=false;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-  const toggle=host.querySelector('.explorer-pause');
   const canRun=()=>!paused&&!readingThought&&!reduced.matches&&!document.hidden&&visible;
   function draw() {
     const stillTime=timetable[0].duration+6;
@@ -372,8 +426,10 @@ function initialize() {
   }
   function sync() {
     cancelAnimationFrame(raf);raf=0;last=0;
-    toggle.hidden=reduced.matches;toggle.textContent=paused?'Resume':'Pause';
-    toggle.setAttribute('aria-label',paused?'Resume the explorer and quotes':'Pause the explorer and quotes');
+    canvas.tabIndex=reduced.matches?-1:0;
+    canvas.setAttribute('role',reduced.matches?'img':'button');
+    canvas.setAttribute('aria-label',reduced.matches?'An explorer reading a book':paused?'Resume animation':'Pause animation');
+    canvas.setAttribute('aria-pressed',String(paused));
     if(canRun())raf=requestAnimationFrame(tick);else draw();
   }
   function holdThought(){readingThought=hoveredThought||focusedThought;sync();}
@@ -382,6 +438,14 @@ function initialize() {
   thought.addEventListener('focus',()=>{focusedThought=true;holdThought();});
   thought.addEventListener('blur',()=>{focusedThought=false;holdThought();});
   thought.addEventListener('keydown',event=>{if(event.key==='Escape'){hoveredThought=false;thought.blur();holdThought();}});
+  function toggleMotion() {
+    if(reduced.matches)return;
+    document.dispatchEvent(new CustomEvent('sk-motion-change',{detail:{paused:!paused}}));
+  }
+  canvas.addEventListener('click',toggleMotion);
+  canvas.addEventListener('keydown',event=>{
+    if(event.key===' '||event.key==='Enter'){event.preventDefault();toggleMotion();}
+  });
   document.addEventListener('sk-motion-change',event=>{paused=event.detail.paused;sync();});
   document.addEventListener('visibilitychange',sync);reduced.addEventListener('change',sync);
   new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;sync();}).observe(host);
