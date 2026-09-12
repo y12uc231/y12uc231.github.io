@@ -285,10 +285,13 @@ function initialize() {
     const bookOut=reading?smooth((state.t-.65)/1.25)*(1-smooth((state.t-8.2)/1.4)):0;
     const openBook=reading?smooth((state.t-1.5)/.75)*(1-smooth((state.t-7.8)/.7)):0;
     const discovery=reading?smooth((state.t-6.1)/.8)*(1-smooth((state.t-8.1)/.7)):0;
-    let origin,heading,feet,gait=0,motion=0,aheadTurn=0;
+    let origin,heading,feet,gait=0,motion=0,aheadTurn=0,uphill=0;
     if(moving) {
       const d=walkProgress(state.f,state.alreadyWalking)*(routeLengths[state.route]+strides[state.route]*.5);
       const sample=routePoint(state.route,d);origin=sample.point;heading=yawOf(sample.direction);
+      const normal=normalAt(origin.x,origin.z);
+      const grade=-(normal.x*sample.direction.x+normal.z*sample.direction.z)/normal.y;
+      uphill=smooth(grade/1.2);
       feet=legs.map(l=>walkingFoot(state.route,d,l.side));
       gait=d/strides[state.route]*Math.PI*2;
       motion=(state.alreadyWalking?1:smooth(state.t/.9))*(1-smooth((state.t-state.duration+1.1)/1.1));
@@ -347,10 +350,12 @@ function initialize() {
     turningPage.rotation.y=-.2-pageTurn*(Math.PI-.4);
     for(const arm of arms) {
       const shoulder=V(arm.side*.107,.105,0).applyEuler(torso.rotation).add(torso.position);
-      // Swing the whole arm from its shoulder, with a small, constant elbow bend.
-      const swing=.09*Math.sin(gait+arm.side*Math.PI/2)*motion;
+      // Counter-swing against the stepping leg; uphill effort gently flexes the elbow.
+      const armPhase=arm.side*Math.cos(gait);
+      const swing=(.24+.06*uphill)*armPhase*motion;
+      const elbowBend=.07+motion*(.09+.16*uphill+.05*Math.max(0,armPhase));
       const upper=V(arm.side*.025,-1,0).normalize().applyAxisAngle(V(1,0,0),-swing);
-      const lower=upper.clone().applyAxisAngle(V(1,0,0),-.07);
+      const lower=upper.clone().applyAxisAngle(V(1,0,0),-elbowBend);
       const relaxed=shoulder.clone().addScaledVector(upper,arm.upperLength).addScaledVector(lower,arm.lowerLength);
       const holding=V(arm.side*mix(.018,.105,openBook),-.007,.018).applyEuler(book.rotation).add(book.position);
       if(arm.side>0&&reading) {

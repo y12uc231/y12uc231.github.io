@@ -125,7 +125,7 @@ test('reading stops show both the face and the book', () => {
   }
 });
 
-test('walking arms hang almost straight without flaring sideways', () => {
+test('walking elbows flex naturally without sideways flare or bent wrists', () => {
   let time = 0;
   for (const stage of rig.timetable) {
     if (stage.kind === 'walk') {
@@ -133,19 +133,55 @@ test('walking arms hang almost straight without flaring sideways', () => {
         rig.pose(time + age);
         for (const arm of rig.arms) {
           const [shoulder, elbow, wrist] = arm.shape.joints;
-          assert(shoulder.distanceTo(wrist) / (arm.upperLength + arm.lowerLength) > .998);
+          const upper=elbow.clone().sub(shoulder).normalize();
+          const lower=wrist.clone().sub(elbow).normalize();
+          const flex=upper.angleTo(lower)*180/Math.PI;
+          assert(flex>2 && flex<25, `Unnatural walking elbow bend at ${time+age}`);
           assert(Math.abs(elbow.x - shoulder.x) < .028, 'Elbow flares out');
-          assert(shoulder.y - wrist.y > .32);
+          assert(shoulder.y - wrist.y > .28, 'Walking hands rise too high');
           const fingers=new THREE.Vector3(0,-1,0).applyQuaternion(arm.hand.quaternion);
           const forearm=wrist.clone().sub(elbow).normalize();
           assert(fingers.dot(forearm) > .999, 'Wrist must follow the forearm');
           const thumb=new THREE.Vector3(-arm.side,0,0).applyQuaternion(arm.hand.quaternion);
-          assert(thumb.z > .9, 'Relaxed thumbs should point forward, not backward');
+          assert(thumb.z > .75, 'Relaxed thumbs should point forward, not backward');
         }
       }
     }
     time += stage.duration;
   }
+});
+
+test('arms visibly counter-swing with the feet and flex more on climbs', () => {
+  const shoulders=[[],[]], uphillFlex=[], downhillFlex=[];
+  let oppositeSteps=0, samples=0;
+  for(let time=0;time<rig.total;time+=.12) {
+    const state=rig.phaseAt(time);
+    if(state.kind!=='walk'||state.t<1||state.duration-state.t<1.2)continue;
+    rig.pose(time);
+    const {x,z}=rig.actor.position,yaw=rig.actor.rotation.y;
+    const dx=.02*Math.sin(yaw),dz=.02*Math.cos(yaw);
+    const grade=(rig.heightAt(x+dx,z+dz)-rig.heightAt(x-dx,z-dz))/.04;
+    rig.arms.forEach((arm,i)=>{
+      const [shoulder,elbow,wrist]=arm.shape.joints;
+      const upper=elbow.clone().sub(shoulder).normalize();
+      const lower=wrist.clone().sub(elbow).normalize();
+      shoulders[i].push(Math.atan2(upper.z,-upper.y));
+      const flex=upper.angleTo(lower)*180/Math.PI;
+      if(grade>.8)uphillFlex.push(flex);
+      if(grade<-.2)downhillFlex.push(flex);
+    });
+    const armLead=rig.arms[0].shape.joints[2].z-rig.arms[1].shape.joints[2].z;
+    const footLead=rig.legs[0].shape.joints[2].z-rig.legs[1].shape.joints[2].z;
+    if(Math.abs(armLead)>.035 && Math.abs(footLead)>.04) {
+      samples++;
+      if(armLead*footLead<0)oppositeSteps++;
+    }
+  }
+  for(const angles of shoulders)assert(Math.max(...angles)-Math.min(...angles)>.45,'Shoulder swing is barely visible');
+  assert(samples>50 && oppositeSteps/samples>.75,'Arm and opposite leg should advance together');
+  const mean=values=>values.reduce((sum,value)=>sum+value,0)/values.length;
+  assert(uphillFlex.length>50 && downhillFlex.length>50);
+  assert(mean(uphillFlex)-mean(downhillFlex)>5,'Climbing should produce a clear, modest elbow bend');
 });
 
 test('limbs stay straight between joints throughout walking and reading', () => {
