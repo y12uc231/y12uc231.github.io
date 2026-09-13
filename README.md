@@ -4,6 +4,8 @@ Static research portfolio for [satyapriyakrishna.com](https://satyapriyakrishna.
 
 The page opens with a small explorer walking through a rolling loss landscape, stopping to read and follow new ideas. Fifty attributed quotations rotate every seven seconds, with highlighted phrases and linked sources. Selected work rotates in groups of four, starting with TurnBench; the full publication list stays available below. Hover, keyboard focus, reduced-motion preferences, and hidden tabs suspend the relevant motion. Clicking the scene or activating it with the keyboard pauses or resumes the explorer and quotes.
 
+Each page load selects one of twelve original mathematical landscapes from a shuffled deck stored in the visitor’s browser. All twelve appear before a repeat, and consecutive rounds avoid repeating the same surface. A small shared entry ridge preserves the explorer’s immediate entrance; later waypoints favor nearby visible valleys, and foot contacts, stride distances, and arm motion follow the selected terrain. When browser storage is unavailable, selection still works with a fresh random choice.
+
 ## Update content
 
 - Edit `index.html` for the introduction, news, biography, and contact information.
@@ -11,6 +13,7 @@ The page opens with a small explorer walking through a rolling loss landscape, s
 - Edit `data/quotes.json` for quotations, author/source links, and the exact phrases highlighted in each quote; the same build command renders them.
 - Edit `css/portfolio.css` for the design.
 - Edit `js/explorer-world.js` for the landscape and character choreography.
+- Edit `js/loss-landscapes.js` for the surface functions and refresh rotation; the build versions this module along with the scene.
 - The original CV, custom domain, assets, and resource page are retained.
 
 Run `python3 -m http.server 8765 --bind 127.0.0.1` from the repository to preview locally. No package installation is required; Three.js is vendored in `js/vendor/` with its license. `python3 scripts/build.py` creates a distributable static copy in `dist/`; the tracked root `index.html` remains directly deployable by GitHub Pages.

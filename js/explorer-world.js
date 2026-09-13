@@ -1,4 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
+import { selectLandscape } from './loss-landscapes.js?v=c67791504d';
 
 // An articulated character on an illustrative loss surface, with world-space foot contacts.
 const host = document.querySelector('.loss-explorer');
@@ -44,12 +45,9 @@ function initialize() {
     if(t>1-ramp)return 1-ramp*integral((1-t)/ramp)/(1-ramp);
     return (t-ramp*.5)/(1-ramp);
   }
-  // Interfering waves form many comparable peaks, saddles, and valleys.
-  const heightAt=(x,z)=>{
-    const r=(7*x+9*z)/Math.sqrt(130),s=(9*x-7*z)/Math.sqrt(130);
-    return .75+.35*Math.cos(3.25*r+.3)*Math.cos(3*s-.2)
-      +.24*Math.cos(3.8*r-1.7*s+.8)+.14*Math.sin(1.5*r+3.6*s);
-  };
+  let landscapeStorage;
+  try { landscapeStorage=localStorage; } catch {}
+  const landscape=selectLandscape(landscapeStorage),heightAt=landscape.height;
   const normalAt=(x,z)=>V(-(heightAt(x+.01,z)-heightAt(x-.01,z))/.02,1,-(heightAt(x,z+.01)-heightAt(x,z-.01))/.02).normalize();
   const terrainGeometry=new THREE.PlaneGeometry(7.4,7.4,100,100);
   terrainGeometry.rotateX(-Math.PI/2);
@@ -209,8 +207,33 @@ function initialize() {
   const aligned=(r,s)=>V((7*r+9*s)/Math.sqrt(130),0,(9*r-7*s)/Math.sqrt(130));
   // Start just behind a nearby crest, already walking around its edge.
   const anchors=[[-1.1,.02],[-1.1,-.9],[-.2,-2],[1.25,-2],[2.2,-.35],[1.6,.1],[2.2,1.4],[.6,2.3],[-.8,2.5],[-2.1,1.8],[-2.5,.6],[-1.1,1.1]].map(([r,s])=>aligned(r,s));
+  if(landscape.id!=='original-interference') {
+    // Prefer nearby low places with a clear view of the book when he stops.
+    const towardCamera=V(7,0,9).normalize(),rise=5.72/Math.sqrt(130);
+    function clearance(point) {
+      const base=heightAt(point.x,point.z);
+      let hiddenBy=0;
+      for(let distance=.06;distance<3;distance+=.06) {
+        const x=point.x+towardCamera.x*distance,z=point.z+towardCamera.z*distance;
+        if(Math.max(Math.abs(x),Math.abs(z))>3.7)break;
+        hiddenBy=Math.max(hiddenBy,heightAt(x,z)-base-rise*distance);
+      }
+      return hiddenBy;
+    }
+    for(let i=2;i<anchors.length-1;i++) {
+      const nominal=anchors[i];
+      let best=nominal,score=Infinity;
+      for(const radius of [0,.2,.4,.6])for(let angle=0;angle<8;angle++) {
+        const candidate=nominal.clone().add(V(Math.cos(angle*Math.PI/4)*radius,0,Math.sin(angle*Math.PI/4)*radius));
+        if(Math.max(Math.abs(candidate.x),Math.abs(candidate.z))>3.1)continue;
+        const hiddenBy=clearance(candidate);
+        const cost=heightAt(candidate.x,candidate.z)+radius*.55+Math.max(0,hiddenBy-.20)*12;
+        if(cost<score){best=candidate;score=cost;}
+      }
+      anchors[i]=best;
+    }
+  }
   const boundaries=[0,1,4,6,8,10,12];
-  const places=boundaries.slice(0,-1).map(i=>anchors[i]);
   const routes=boundaries.slice(0,-1).map((start,i)=>{
     const path=new THREE.CurvePath();
     for(let j=start;j<boundaries[i+1];j++) {

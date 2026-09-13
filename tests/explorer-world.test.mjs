@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import * as THREE from '../js/vendor/three.module.min.js';
+import { LANDSCAPES } from '../js/loss-landscapes.js';
 
 // Exercise the actual geometry and choreography without requiring a GPU or browser.
-function scene(reducedMotion = false) {
+function scene(reducedMotion = false, landscapeIndex=0) {
   const events=()=>({listeners:{},addEventListener(name,fn){(this.listeners[name]??=[]).push(fn);},dispatchEvent(event){this.listeners[event.type]?.forEach(fn=>fn(event));}});
   const thought = {style: {setProperty() {}}, addEventListener() {}};
   const canvas = {...events(),attributes:{},setAttribute(name,value){this.attributes[name]=value;},clientWidth: 1000, clientHeight: 500};
@@ -19,6 +20,7 @@ function scene(reducedMotion = false) {
   }
   const context = {
     THREE: {...THREE, WebGLRenderer: Renderer}, devicePixelRatio: 1,
+    selectLandscape:()=>LANDSCAPES[landscapeIndex],
     document: {...events(),hidden: false, querySelector: () => host},
     CustomEvent: class {constructor(type,options){this.type=type;Object.assign(this,options);}},
     matchMedia: () => ({matches: reducedMotion, addEventListener() {}}),
@@ -27,7 +29,7 @@ function scene(reducedMotion = false) {
     IntersectionObserver: class { observe() {} },
     ResizeObserver: class { constructor(fn) { this.fn = fn; } observe() { this.fn(); } }
   };
-  let source = readFileSync(new URL('../js/explorer-world.js', import.meta.url), 'utf8').replace(/^import[^\n]*\n/, '');
+  let source = readFileSync(new URL('../js/explorer-world.js', import.meta.url), 'utf8').replace(/^import[^\n]*\n/gm, '');
   source = source.replace("host.classList.add('world-ready');draw();sync();",
     "globalThis.rig={pose,phaseAt,heightAt,actor,head,book,world,camera,ground,timetable,total,walkingFoot,routeLengths,CHARACTER_SCALE,legs,arms};host.classList.add('world-ready');draw();sync();");
   vm.runInNewContext(source, context);

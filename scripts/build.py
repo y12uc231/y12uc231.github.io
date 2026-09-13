@@ -58,6 +58,10 @@ assert len({q['text'].casefold() for q in quotes}) == len(quotes), 'Quotes must 
 assert all(q.get('author') and q.get('source', '').startswith('https://') for q in quotes), 'Every quote needs a named source'
 rendered_quotes = '\n        '.join(quotation(q, i) for i,q in enumerate(quotes))
 html = re.sub(re.escape(start) + r'.*?' + re.escape(end), lambda _: start + '\n        ' + rendered_quotes + '\n        ' + end, html, flags=re.S)
+# Version the nested landscape module before computing the world script's hash.
+world_script = root / 'js/explorer-world.js'
+landscape_version = hashlib.sha256((root / 'js/loss-landscapes.js').read_bytes()).hexdigest()[:10]
+world_script.write_text(re.sub(r"\./loss-landscapes\.js(?:\?v=[^'\"]*)?", './loss-landscapes.js?v=' + landscape_version, world_script.read_text()))
 # Refresh edited local assets even when a previous preview is cached.
 for asset in ('css/portfolio.css', 'js/explorer-world.js', 'js/opening-quotes.js', 'js/paper-rotation.js'):
     version = hashlib.sha256((root / asset).read_bytes()).hexdigest()[:10]
